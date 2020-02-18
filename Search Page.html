@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search_Page</title>
+    
+    <script>
+    function SearchResults(){
+      window.alert("ranga bati");
+      var queryData = document.getElementById("SearchQuery").value;
+      window.alert("ranga bati2");
+      var queryterms = new Array();
+      window.alert("ranga bati3");
+      queryterms =queryData.split(" ");
+      window.alert(queryterms);
+      var len = queryterms.length;
+      window.alert(len);
+      var intdquery = "";
+      var i=0;
+      for (i = 0; i < len; i++) { 
+       if ((len-i)==0){
+          intdquery += queryterms[i] + "%5E" + (1).toString()+"%20";
+        }
+        else{
+          intdquery += queryterms[i] + "%5E" + (len-i).toString()+"%20";
+        } 
+      }
+      
+     var finquery = document.getElementById("region").value+"%3A"+intdquery;
+     window.alert(finquery);
+     
+     //var inurl = "http://3.16.150.132:8983/solr/IRF19P4/select?q="+finquery+"&fl=id%2Cscore&wt=json&indent=true&rows=20" 
+     
+     var finquery = "q="+finquery+"&fl=id%2Cscore&wt=json&indent=true&rows=20"
+     
+     // 1. Create a new XMLHttpRequest object
+     var xhr = new XMLHttpRequest();
+
+     // 2. Configure it: GET-request for the URL /article/.../load
+     xhr.open('POST',"http://3.16.150.132:8983/solr/IRF19P4/select");
+     
+     xhr.responseType = "json"
+     // 3. Send the request over the network
+     xhr.send(finquery); 
+     
+     window.alert("Request sent")
+     // 4. This will be called after the response is received
+     xhr.onload = function() {
+       if (xhr.status != 200) { // analyze HTTP status of the response
+          window.alert("Error"); // e.g. 404: Not Found
+       } else { // show the result
+          window.alert(xhr.response); // responseText is the server
+          var results = xhr.response
+       }
+     }  
+     window.alert(xhr.response)
+     xhr.onprogress = function(event) {
+        if (event.lengthComputable) {
+          window.alert(`Received ${event.loaded} of ${event.total} bytes`);
+        }  else {
+          window.alert(`Received ${event.loaded} bytes`); // no Content-Length
+        } 
+
+       }
+
+     xhr.onerror = function() {
+          window.alert("Request failed");
+       }
+    }
+        
+    </script>
+</head>
+<body>
+    <b>Please Fill your requirement with the type of field you want to search in</b>
+    <br>
+    <br>
+	<form>
+		What do want to search for: &nbsp;&nbsp;<input type="text" name="SearchQuery_m" Id="SearchQuery"><br>
+		Where do want the search in:<br>
+		  <input type="radio" Id="region" value="text"> tweet_text &nbsp;&nbsp;
+		  <input type="radio" Id="region" value="headline"> headlines_news &nbsp;&nbsp;
+		  <input type="radio" Id="region" value="abstract"> abstract_news &nbsp;&nbsp;
+      <input type="radio" Id="region" value="decription"> tags &nbsp;&nbsp;
+		  <input type="radio" Id="region" value="desk"> desk_news &nbsp;&nbsp;
+		  <input type="radio" Id="region" value="snippet"> snippet_news &nbsp;&nbsp;
+      <br><br>
+      
+      <button onclick="SearchResults()">SEARCH</button>
+      
+	</form>
+</body>
+</html>
